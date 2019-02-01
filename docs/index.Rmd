@@ -1,0 +1,53 @@
+---
+title: "The self-controlled case series (SCCS)"
+subtitle: "성균관의대 사회의학교실 강의"
+author: "김진섭"
+date: "2019-02-18 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: ["css/footer-header.css", "default"]
+    lib_dir: libs
+    nature:
+      beforeInit: "js/macros.js"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "4:3" 
+      
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
+library(knitr);library(DT);library(dplyr);library(epiDisplay);library(data.table)
+```
+
+layout: true
+
+<div class="my-footer"><span><a href="https://www.anpanman.co.kr">ANPANMAN Co.,Ltd</a>   
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+<a href="https://github.com/jinseob2kim">김진섭</a></span></div> 
+
+
+---
+# Executive Summary 
+
+.large[
+
+* 
+]
+
+
+---
+
+class: center, middle
+
+
+# END
+
