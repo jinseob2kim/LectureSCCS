@@ -18,13 +18,24 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: "4:3" 
-      
+bibliography: ref.bib      
 ---
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
 library(knitr);library(DT);library(dplyr);library(epiDisplay);library(data.table)
+```
+
+```{r, load_refs, echo=FALSE, cache=FALSE}
+library(RefManageR)
+BibOptions(check.entries = FALSE, 
+           bib.style = "numeric", 
+           cite.style = 'numeric', 
+           style = "markdown",
+           hyperlink = T, 
+           dashed = FALSE)
+myBib <- ReadBib("./ref.bib", check = FALSE)
 ```
 
 layout: true
@@ -40,7 +51,13 @@ layout: true
 
 .large[
 
-* 
+* Self-controlled methods는 자기 자신을 대조군으로 비교, time-invariant confounders의 영향을 최소화할 수 있다. 
+
+* **Self-controlled case series (SCCS)**, case-crossover (CCO) design, sequence symmetry analysis (SSA)가 대표적이다.
+
+* SCCS는 위험에 노출된 기간과 그렇지 않은 기간의 **상대위험도 (RR)** 를 구한다`r Citep(myBib, "Takeuchi2018")`. 
+
+* `r Citep(myBib, "Petersen2016")`
 ]
 
 
@@ -51,3 +68,10 @@ class: center, middle
 
 # END
 
+---
+
+# References
+
+```{r, 'refs', results='asis', echo=FALSE}
+PrintBibliography(myBib)
+```
