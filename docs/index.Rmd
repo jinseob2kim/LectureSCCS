@@ -95,12 +95,6 @@ datatable(tb.comp, rownames = F, options = list(dom = "<t>"))
 
 Table from `r Citet(myBib, "Takeuchi2018")`
 
----
-# CCO와의 차이점
-
-* RR 
-
-* 
 
 ---
 # R example
@@ -234,6 +228,27 @@ clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLon
 
 ```
 
+
+---
+# 조심 
+
+.large[
+* Time-varying confounder
+
+* Time trends in both exposures and events
+
+* Erroneously long risk periods 
+
+* Patient restriction based on event history
+]
+
+---
+
+```{r, message = F, out.width="20%"}
+datatable(read_delim("assumptions_sccs.csv", delim = "\t"), rownames = F, caption = "Violation of assumptions, impact, and solutions with examples of good practice", options = list(dom ="<<t>ip>"  ,pageLength = 3))
+```
+
+Table from `r Citet(myBib, "Petersen2016")`
 ---
 
 class: center, middle
