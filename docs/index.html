@@ -5,6 +5,17 @@
     <meta charset="utf-8">
     <meta name="author" content="김진섭" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <link href="libs/pagedtable/css/pagedtable.css" rel="stylesheet" />
+    <script src="libs/pagedtable/js/pagedtable.js"></script>
     <link rel="stylesheet" href="css/footer-header.css" type="text/css" />
   </head>
   <body>
@@ -40,16 +51,175 @@ layout: true
 
 * **Self-controlled case series (SCCS)**, case-crossover (CCO) design, sequence symmetry analysis (SSA)가 대표적이다.
 
-* SCCS는 위험에 노출된 기간과 그렇지 않은 기간의 **상대위험도 (RR)** 를 구한다[[1](#bib-Takeuchi2018)]. 
+* SCCS는 위험에 노출된 기간과 그렇지 않은 기간의 **상대위험도 (RR)** 를 구한다. 
 
-* [[2](#bib-Petersen2016)]
+* 한 사람에게 일어나는 각 **사건(ex: 노출, 발생, 나이)이 변화할 때 마다 데이터를 만든다** (Long format data).
+
+* Matched case-control study와 유사, **Conditional logistic regression**으로 분석한다.
 ]
 
 
 ---
+# Self-controlled methods 비교
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="https://media.springernature.com/lw785/springer-static/image/art%3A10.1186%2Fs12874-017-0457-7/MediaObjects/12874_2017_457_Fig1_HTML.gif" alt="a: SCCS, b: CCO, c: SSA" width="50%" /&gt;
+&lt;p class="caption"&gt;a: SCCS, b: CCO, c: SSA&lt;/p&gt;
+&lt;/div&gt;
+
+Figure from &lt;a name=cite-Takeuchi2018&gt;&lt;/a&gt;[Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
+
+---
+
+<div id="htmlwidget-71ecde4a8b892c674cf0" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-71ecde4a8b892c674cf0">{"x":{"filter":"none","data":[["Self-controlled case series","Case-crossover design","Sequence symmetry analysis"],["Incident rate ratio","(Exposure) odds ratio","Adjusted sequence ratio"],["Case patients who experienced at least one event during each observation period","Case patients who experienced at least one event during each observation period","Case patients who experienced at least one exposure or one event during each observation period"],["Every exposure and every event for each case patient","Every exposure and the first event for each case patient","The first exposure and first event for the study population"],["Events do not alter the probability of subsequent exposure and events.","There are no time-trends in the occurrence of exposure.","Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.\n"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Methods<\/th>\n      <th>Effect measures<\/th>\n      <th>Study populations<\/th>\n      <th>Information used in analysis<\/th>\n      <th>Main assumptions<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<t>","order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+Table from [Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
+
+---
+# CCO와의 차이점
+
+* RR 
+
+* 
+
+---
+# R example
+
+
+```r
+library(readr);library(tidyr);library(purrr);library(dplyr);library(rmarkdown)
+## Raw data
+dat &lt;- read_tsv("http://statistics.open.ac.uk/sccs/R/ox.txt")
+paged_table(dat)
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["indiv"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["eventday"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["start"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["end"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["exday"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"398","3":"365","4":"730","5":"458"},{"1":"2","2":"413","3":"365","4":"730","5":"392"},{"1":"3","2":"449","3":"365","4":"730","5":"429"},{"1":"4","2":"455","3":"365","4":"730","5":"433"},{"1":"5","2":"472","3":"365","4":"730","5":"432"},{"1":"6","2":"474","3":"365","4":"730","5":"395"},{"1":"7","2":"485","3":"365","4":"730","5":"470"},{"1":"8","2":"524","3":"365","4":"730","5":"496"},{"1":"9","2":"700","3":"365","4":"730","5":"428"},{"1":"10","2":"399","3":"365","4":"730","5":"716"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+From https://rpubs.com/kaz_yos/sccs1
+
+---
+# Assumptions
+
+.large[
+* 노출 위험 기간: 노출 시작부터 14-35일. 
+
+* 나이 바뀌는 날: 365-730일의 중간인 547일.
+]
+
+---
+# Long format data
+
+
+
+
+
+```r
+dat %&gt;% 
+  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %&gt;% 
+  split(.$indiv) %&gt;% 
+  map_dfr(MakeLongformat) %&gt;% 
+  paged_table
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["indiv"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["exday"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["eventday"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["start"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["end"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["event"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["exgr"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["agegr"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["interval"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["loginterval"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"458","3":"398","4":"365","5":"472","6":"1","7":"0","8":"0","9":"107","10":"4.672829"},{"1":"1","2":"458","3":"398","4":"472","5":"493","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"1","2":"458","3":"398","4":"493","5":"547","6":"0","7":"0","8":"0","9":"54","10":"3.988984"},{"1":"1","2":"458","3":"398","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"2","2":"392","3":"413","4":"365","5":"406","6":"0","7":"0","8":"0","9":"41","10":"3.713572"},{"1":"2","2":"392","3":"413","4":"406","5":"427","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"2","2":"392","3":"413","4":"427","5":"547","6":"0","7":"0","8":"0","9":"120","10":"4.787492"},{"1":"2","2":"392","3":"413","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"3","2":"429","3":"449","4":"365","5":"443","6":"0","7":"0","8":"0","9":"78","10":"4.356709"},{"1":"3","2":"429","3":"449","4":"443","5":"464","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"3","2":"429","3":"449","4":"464","5":"547","6":"0","7":"0","8":"0","9":"83","10":"4.418841"},{"1":"3","2":"429","3":"449","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"4","2":"433","3":"455","4":"365","5":"447","6":"0","7":"0","8":"0","9":"82","10":"4.406719"},{"1":"4","2":"433","3":"455","4":"447","5":"468","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"4","2":"433","3":"455","4":"468","5":"547","6":"0","7":"0","8":"0","9":"79","10":"4.369448"},{"1":"4","2":"433","3":"455","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"5","2":"432","3":"472","4":"365","5":"446","6":"0","7":"0","8":"0","9":"81","10":"4.394449"},{"1":"5","2":"432","3":"472","4":"446","5":"467","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"5","2":"432","3":"472","4":"467","5":"547","6":"1","7":"0","8":"0","9":"80","10":"4.382027"},{"1":"5","2":"432","3":"472","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"6","2":"395","3":"474","4":"365","5":"409","6":"0","7":"0","8":"0","9":"44","10":"3.784190"},{"1":"6","2":"395","3":"474","4":"409","5":"430","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"6","2":"395","3":"474","4":"430","5":"547","6":"1","7":"0","8":"0","9":"117","10":"4.762174"},{"1":"6","2":"395","3":"474","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"7","2":"470","3":"485","4":"365","5":"484","6":"0","7":"0","8":"0","9":"119","10":"4.779123"},{"1":"7","2":"470","3":"485","4":"484","5":"505","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"7","2":"470","3":"485","4":"505","5":"547","6":"0","7":"0","8":"0","9":"42","10":"3.737670"},{"1":"7","2":"470","3":"485","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"8","2":"496","3":"524","4":"365","5":"510","6":"0","7":"0","8":"0","9":"145","10":"4.976734"},{"1":"8","2":"496","3":"524","4":"510","5":"531","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"8","2":"496","3":"524","4":"531","5":"547","6":"0","7":"0","8":"0","9":"16","10":"2.772589"},{"1":"8","2":"496","3":"524","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"9","2":"428","3":"700","4":"365","5":"442","6":"0","7":"0","8":"0","9":"77","10":"4.343805"},{"1":"9","2":"428","3":"700","4":"442","5":"463","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"9","2":"428","3":"700","4":"463","5":"547","6":"0","7":"0","8":"0","9":"84","10":"4.430817"},{"1":"9","2":"428","3":"700","4":"547","5":"730","6":"1","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"10","2":"716","3":"399","4":"365","5":"547","6":"1","7":"0","8":"0","9":"182","10":"5.204007"},{"1":"10","2":"716","3":"399","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"10","2":"716","3":"399","4":"730","5":"730","6":"0","7":"1","8":"1","9":"0","10":"-Inf"},{"1":"10","2":"716","3":"399","4":"730","5":"751","6":"0","7":"1","8":"1","9":"21","10":"3.044522"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+---
+
+
+```r
+MakeLongformat &lt;- function(df) {
+  ## Cut points
+  cuts &lt;- with(df, sort(c(start, end, start1, end1, age1)))
+
+  ## Split observation times
+  out &lt;- data.frame(indiv = df$indiv,
+                    exday = df$exday,
+                    eventday = df$eventday,
+                    start = head(cuts, -1),
+                    end   = cuts[-1])
+
+  ## Event status for each interval
+  ## 1 if event day is within the interval
+  out$event &lt;- as.numeric(out$start &lt;= df$eventday &amp; df$eventday &lt;= out$end)
+
+  ## Exposure status for each interval
+  ## 1 if interval is within the window
+  out$exgr &lt;- as.numeric(df$start1 &lt;= out$start &amp; out$end &lt;= df$end1)
+
+  ## Age group status for each interval
+  ## 1 if start is greater than the age cutoff
+  out$agegr &lt;- as.numeric(out$start &gt;= df$age1)
+
+  ## Interval length
+  out$interval &lt;- out$end - out$start
+  out$loginterval &lt;- log(out$interval)
+
+  out
+  }
+```
+
+
+---
+# Conditional logistic regression
+
+Long format data
+
+
+```r
+datLong &lt;- dat %&gt;% 
+  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %&gt;% 
+  split(.$indiv) %&gt;% 
+  map_dfr(MakeLongformat) %&gt;% filter(start &lt; 730)
+```
+
+Analysis with `clogit`
+
+
+```r
+library(survival)
+clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %&gt;% 
+  summary 
+```
+
+---
+
+
+```
+## Call:
+## coxph(formula = Surv(rep(1, 38L), event) ~ exgr + agegr + strata(indiv) + 
+##     offset(loginterval), data = datLong, method = "exact")
+## 
+##   n= 38, number of events= 10 
+## 
+##          coef exp(coef) se(coef)      z Pr(&gt;|z|)    
+## exgr   2.4880   12.0369   0.7085  3.512 0.000445 ***
+## agegr -1.4906    0.2252   1.1182 -1.333 0.182543    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##       exp(coef) exp(-coef) lower .95 upper .95
+## exgr    12.0369    0.08308   3.00226    48.259
+## agegr    0.2252    4.43965   0.02517     2.016
+## 
+## Concordance= 0.75  (se = 0.138 )
+## Rsquare= 0.392   (max possible= 0.643 )
+## Likelihood ratio test= 18.92  on 2 df,   p=8e-05
+## Wald test            = 19.1  on 2 df,   p=7e-05
+## Score (logrank) test = 42.29  on 2 df,   p=7e-10
+```
+
+---
 
 class: center, middle
-
 
 # END
 
@@ -57,7 +227,8 @@ class: center, middle
 
 # References
 
-[1] Y. Takeuchi, T. Shinozaki and Y. Matsuyama. "A comparison of
+&lt;a name=bib-Takeuchi2018&gt;&lt;/a&gt;[[1]](#cite-Takeuchi2018) Y.
+Takeuchi, T. Shinozaki and Y. Matsuyama. "A comparison of
 estimators from self-controlled case series, case-crossover
 design, and sequence symmetry analysis for pharmacoepidemiological
 studies". In: _BMC Medical Research Methodology_ 18.1 (Jan. 2018).
@@ -65,12 +236,6 @@ DOI:
 [10.1186/s12874-017-0457-7](https://doi.org/10.1186/s12874-017-0457-7).
 URL:
 [https://doi.org/10.1186/s12874-017-0457-7](https://doi.org/10.1186/s12874-017-0457-7).
-
-[2] I. Petersen, I. Douglas and H. Whitaker. "Self controlled case
-series methods: an alternative to standard epidemiological study
-designs". In: _BMJ_ (Sep. 2016), p. i4515. DOI:
-[10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515). URL:
-[https://doi.org/10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515).
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script src="js/macros.js"></script>

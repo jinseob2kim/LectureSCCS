@@ -24,7 +24,7 @@ bibliography: ref.bib
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
-library(knitr);library(DT);library(dplyr);library(epiDisplay);library(data.table)
+library(knitr);library(DT);library(dplyr);library(data.table);library(rmarkdown);library(readr);library(purrr);library(tidyr)
 ```
 
 ```{r, load_refs, echo=FALSE, cache=FALSE}
@@ -33,7 +33,7 @@ BibOptions(check.entries = FALSE,
            bib.style = "numeric", 
            cite.style = 'numeric', 
            style = "markdown",
-           hyperlink = T, 
+           hyperlink = "to.doc", 
            dashed = FALSE)
 myBib <- ReadBib("./ref.bib", check = FALSE)
 ```
@@ -55,16 +55,188 @@ layout: true
 
 * **Self-controlled case series (SCCS)**, case-crossover (CCO) design, sequence symmetry analysis (SSA)가 대표적이다.
 
-* SCCS는 위험에 노출된 기간과 그렇지 않은 기간의 **상대위험도 (RR)** 를 구한다`r Citep(myBib, "Takeuchi2018")`. 
+* SCCS는 위험에 노출된 기간과 그렇지 않은 기간의 **상대위험도 (RR)** 를 구한다. 
 
-* `r Citep(myBib, "Petersen2016")`
+* 한 사람에게 일어나는 각 **사건(ex: 노출, 발생, 나이)이 변화할 때 마다 데이터를 만든다** (Long format data).
+
+* Matched case-control study와 유사, **Conditional logistic regression**으로 분석한다.
 ]
 
 
 ---
+# Self-controlled methods 비교
+
+```{r, fig.cap = "a: SCCS, b: CCO, c: SSA", out.width="50%"}
+include_graphics("https://media.springernature.com/lw785/springer-static/image/art%3A10.1186%2Fs12874-017-0457-7/MediaObjects/12874_2017_457_Fig1_HTML.gif")
+```
+
+Figure from `r Citet(myBib, "Takeuchi2018")`
+
+---
+
+```{r, out.width= "70%"}
+tb.comp <- data.table(Methods = c("Self-controlled case series", "Case-crossover design", "Sequence symmetry analysis"),
+                      `Effect measures` = c("Incident rate ratio", "(Exposure) odds ratio", "Adjusted sequence ratio"),
+                      `Study populations` = c("Case patients who experienced at least one event during each observation period",
+                                            "Case patients who experienced at least one event during each observation period",
+                                            "Case patients who experienced at least one exposure or one event during each observation period"),
+                      `Information used in analysis` = c("Every exposure and every event for each case patient",
+                                                         "Every exposure and the first event for each case patient",
+                                                         "The first exposure and first event for the study population"),
+                      `Main assumptions` = c("Events do not alter the probability of subsequent exposure and events.",
+                                             "There are no time-trends in the occurrence of exposure.",
+                                             "Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.
+")
+)
+
+ 
+datatable(tb.comp, rownames = F, options = list(dom = "<t>"))
+```
+
+Table from `r Citet(myBib, "Takeuchi2018")`
+
+---
+# CCO와의 차이점
+
+* RR 
+
+* 
+
+---
+# R example
+
+```{r, echo= T, message = F}
+library(readr);library(tidyr);library(purrr);library(dplyr);library(rmarkdown)
+## Raw data
+dat <- read_tsv("http://statistics.open.ac.uk/sccs/R/ox.txt")
+paged_table(dat)
+```
+
+From https://rpubs.com/kaz_yos/sccs1
+
+---
+# Assumptions
+
+.large[
+* 노출 위험 기간: 노출 시작부터 14-35일. 
+
+* 나이 바뀌는 날: 365-730일의 중간인 547일.
+]
+
+---
+# Long format data
+
+```{r, include = F}
+MakeLongformat <- function(df) {
+  ## Cut points
+  cuts <- with(df, sort(c(start, end, start1, end1, age1)))
+
+  ## Split observation times
+  out <- data.frame(indiv = df$indiv,
+                    exday = df$exday,
+                    eventday = df$eventday,
+                    start = head(cuts, -1),
+                    end   = cuts[-1])
+
+  ## Event status for each interval
+  ## 1 if event day is within the interval
+  out$event <- as.numeric(out$start <= df$eventday & df$eventday <= out$end)
+
+  ## Exposure status for each interval
+  ## 1 if interval is within the window
+  out$exgr <- as.numeric(df$start1 <= out$start & out$end <= df$end1)
+
+  ## Age group status for each interval
+  ## 1 if start is greater than the age cutoff
+  out$agegr <- as.numeric(out$start >= df$age1)
+
+  ## Interval length
+  out$interval <- out$end - out$start
+  out$loginterval <- log(out$interval)
+
+  out
+  }
+```
+
+
+```{r, echo=T}
+dat %>% 
+  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %>% 
+  split(.$indiv) %>% 
+  map_dfr(MakeLongformat) %>% 
+  paged_table
+
+```
+
+---
+
+```{r, echo=T, eval= F}
+MakeLongformat <- function(df) {
+  ## Cut points
+  cuts <- with(df, sort(c(start, end, start1, end1, age1)))
+
+  ## Split observation times
+  out <- data.frame(indiv = df$indiv,
+                    exday = df$exday,
+                    eventday = df$eventday,
+                    start = head(cuts, -1),
+                    end   = cuts[-1])
+
+  ## Event status for each interval
+  ## 1 if event day is within the interval
+  out$event <- as.numeric(out$start <= df$eventday & df$eventday <= out$end)
+
+  ## Exposure status for each interval
+  ## 1 if interval is within the window
+  out$exgr <- as.numeric(df$start1 <= out$start & out$end <= df$end1)
+
+  ## Age group status for each interval
+  ## 1 if start is greater than the age cutoff
+  out$agegr <- as.numeric(out$start >= df$age1)
+
+  ## Interval length
+  out$interval <- out$end - out$start
+  out$loginterval <- log(out$interval)
+
+  out
+  }
+```
+
+
+---
+# Conditional logistic regression
+
+Long format data
+
+```{r, echo = T}
+datLong <- dat %>% 
+  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %>% 
+  split(.$indiv) %>% 
+  map_dfr(MakeLongformat) %>% 
+  filter(start < 730)
+```
+
+Analysis with `clogit`
+
+```{r, echo =T, eval=F}
+library(survival)
+clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %>% 
+  summary 
+
+```
+
+---
+
+```{r, echo = F}
+library(survival)
+clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %>% 
+  summary 
+
+```
+
+---
 
 class: center, middle
-
 
 # END
 
