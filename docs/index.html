@@ -67,12 +67,12 @@ layout: true
 &lt;p class="caption"&gt;a: SCCS, b: CCO, c: SSA&lt;/p&gt;
 &lt;/div&gt;
 
-Figure from &lt;a name=cite-Takeuchi2018&gt;&lt;/a&gt;[Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
+Figure from [Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
 
 ---
 
-<div id="htmlwidget-82513dc7751143dc2e62" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-82513dc7751143dc2e62">{"x":{"filter":"none","data":[["Self-controlled case series","Case-crossover design","Sequence symmetry analysis"],["Incident rate ratio","(Exposure) odds ratio","Adjusted sequence ratio"],["Case patients who experienced at least one event during each observation period","Case patients who experienced at least one event during each observation period","Case patients who experienced at least one exposure or one event during each observation period"],["Every exposure and every event for each case patient","Every exposure and the first event for each case patient","The first exposure and first event for the study population"],["Events do not alter the probability of subsequent exposure and events.","There are no time-trends in the occurrence of exposure.","Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.\n"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Methods<\/th>\n      <th>Effect measures<\/th>\n      <th>Study populations<\/th>\n      <th>Information used in analysis<\/th>\n      <th>Main assumptions<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<t>","order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-207d38fa8d15596926fb" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-207d38fa8d15596926fb">{"x":{"filter":"none","data":[["Self-controlled case series","Case-crossover design","Sequence symmetry analysis"],["Incident rate ratio","(Exposure) odds ratio","Adjusted sequence ratio"],["Case patients who experienced at least one event during each observation period","Case patients who experienced at least one event during each observation period","Case patients who experienced at least one exposure or one event during each observation period"],["Every exposure and every event for each case patient","Every exposure and the first event for each case patient","The first exposure and first event for the study population"],["Events do not alter the probability of subsequent exposure and events.","There are no time-trends in the occurrence of exposure.","Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.\n"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Methods<\/th>\n      <th>Effect measures<\/th>\n      <th>Study populations<\/th>\n      <th>Information used in analysis<\/th>\n      <th>Main assumptions<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<t>","order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 Table from [Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
 
@@ -99,11 +99,29 @@ From https://rpubs.com/kaz_yos/sccs1
 ---
 # Assumptions
 
-.large[
-* 노출 위험 기간: 노출 시작부터 14-35일. 
+- 노출 위험 기간: 노출 시작부터 14-35일. 
 
-* 나이 바뀌는 날: 365-730일의 중간인 547일.
-]
+- 나이 바뀌는 날: 365-730일의 중간인 547일.
+
+--
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["indiv"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["eventday"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["start"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["end"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["exday"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"398","3":"365","4":"730","5":"458"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+- 365: 관찰 시작
+
+- 472: 노출 시작 (458 + 14)
+
+- 493: 노출 종료 (458 + 35)
+
+- 547: 나이 증가 
+
+- 730: 관찰 종료
+
+4개 구간 각각의 **사건 발생, 노출 상태, 나이** 데이터를 만들어야 함. 
 
 ---
 # Long format data
@@ -113,16 +131,18 @@ From https://rpubs.com/kaz_yos/sccs1
 
 
 ```r
-dat %&gt;% 
+datLong &lt;- dat %&gt;% 
   mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %&gt;% 
   split(.$indiv) %&gt;% 
   map_dfr(MakeLongformat) %&gt;% 
-  paged_table
+  filter(start &lt; 730) 
+
+paged_table(datLong)
 ```
 
 &lt;div data-pagedtable="false"&gt;
   &lt;script data-pagedtable-source type="application/json"&gt;
-{"columns":[{"label":["indiv"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["exday"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["eventday"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["start"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["end"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["event"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["exgr"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["agegr"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["interval"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["loginterval"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"458","3":"398","4":"365","5":"472","6":"1","7":"0","8":"0","9":"107","10":"4.672829"},{"1":"1","2":"458","3":"398","4":"472","5":"493","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"1","2":"458","3":"398","4":"493","5":"547","6":"0","7":"0","8":"0","9":"54","10":"3.988984"},{"1":"1","2":"458","3":"398","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"2","2":"392","3":"413","4":"365","5":"406","6":"0","7":"0","8":"0","9":"41","10":"3.713572"},{"1":"2","2":"392","3":"413","4":"406","5":"427","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"2","2":"392","3":"413","4":"427","5":"547","6":"0","7":"0","8":"0","9":"120","10":"4.787492"},{"1":"2","2":"392","3":"413","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"3","2":"429","3":"449","4":"365","5":"443","6":"0","7":"0","8":"0","9":"78","10":"4.356709"},{"1":"3","2":"429","3":"449","4":"443","5":"464","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"3","2":"429","3":"449","4":"464","5":"547","6":"0","7":"0","8":"0","9":"83","10":"4.418841"},{"1":"3","2":"429","3":"449","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"4","2":"433","3":"455","4":"365","5":"447","6":"0","7":"0","8":"0","9":"82","10":"4.406719"},{"1":"4","2":"433","3":"455","4":"447","5":"468","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"4","2":"433","3":"455","4":"468","5":"547","6":"0","7":"0","8":"0","9":"79","10":"4.369448"},{"1":"4","2":"433","3":"455","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"5","2":"432","3":"472","4":"365","5":"446","6":"0","7":"0","8":"0","9":"81","10":"4.394449"},{"1":"5","2":"432","3":"472","4":"446","5":"467","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"5","2":"432","3":"472","4":"467","5":"547","6":"1","7":"0","8":"0","9":"80","10":"4.382027"},{"1":"5","2":"432","3":"472","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"6","2":"395","3":"474","4":"365","5":"409","6":"0","7":"0","8":"0","9":"44","10":"3.784190"},{"1":"6","2":"395","3":"474","4":"409","5":"430","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"6","2":"395","3":"474","4":"430","5":"547","6":"1","7":"0","8":"0","9":"117","10":"4.762174"},{"1":"6","2":"395","3":"474","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"7","2":"470","3":"485","4":"365","5":"484","6":"0","7":"0","8":"0","9":"119","10":"4.779123"},{"1":"7","2":"470","3":"485","4":"484","5":"505","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"7","2":"470","3":"485","4":"505","5":"547","6":"0","7":"0","8":"0","9":"42","10":"3.737670"},{"1":"7","2":"470","3":"485","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"8","2":"496","3":"524","4":"365","5":"510","6":"0","7":"0","8":"0","9":"145","10":"4.976734"},{"1":"8","2":"496","3":"524","4":"510","5":"531","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"8","2":"496","3":"524","4":"531","5":"547","6":"0","7":"0","8":"0","9":"16","10":"2.772589"},{"1":"8","2":"496","3":"524","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"9","2":"428","3":"700","4":"365","5":"442","6":"0","7":"0","8":"0","9":"77","10":"4.343805"},{"1":"9","2":"428","3":"700","4":"442","5":"463","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"9","2":"428","3":"700","4":"463","5":"547","6":"0","7":"0","8":"0","9":"84","10":"4.430817"},{"1":"9","2":"428","3":"700","4":"547","5":"730","6":"1","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"10","2":"716","3":"399","4":"365","5":"547","6":"1","7":"0","8":"0","9":"182","10":"5.204007"},{"1":"10","2":"716","3":"399","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"10","2":"716","3":"399","4":"730","5":"730","6":"0","7":"1","8":"1","9":"0","10":"-Inf"},{"1":"10","2":"716","3":"399","4":"730","5":"751","6":"0","7":"1","8":"1","9":"21","10":"3.044522"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["indiv"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["exday"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["eventday"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["start"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["end"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["event"],"name":[6],"type":["int"],"align":["right"]},{"label":["exgr"],"name":[7],"type":["int"],"align":["right"]},{"label":["agegr"],"name":[8],"type":["int"],"align":["right"]},{"label":["interval"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["loginterval"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"458","3":"398","4":"365","5":"472","6":"1","7":"0","8":"0","9":"107","10":"4.672829"},{"1":"1","2":"458","3":"398","4":"472","5":"493","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"1","2":"458","3":"398","4":"493","5":"547","6":"0","7":"0","8":"0","9":"54","10":"3.988984"},{"1":"1","2":"458","3":"398","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"2","2":"392","3":"413","4":"365","5":"406","6":"0","7":"0","8":"0","9":"41","10":"3.713572"},{"1":"2","2":"392","3":"413","4":"406","5":"427","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"2","2":"392","3":"413","4":"427","5":"547","6":"0","7":"0","8":"0","9":"120","10":"4.787492"},{"1":"2","2":"392","3":"413","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"3","2":"429","3":"449","4":"365","5":"443","6":"0","7":"0","8":"0","9":"78","10":"4.356709"},{"1":"3","2":"429","3":"449","4":"443","5":"464","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"3","2":"429","3":"449","4":"464","5":"547","6":"0","7":"0","8":"0","9":"83","10":"4.418841"},{"1":"3","2":"429","3":"449","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"4","2":"433","3":"455","4":"365","5":"447","6":"0","7":"0","8":"0","9":"82","10":"4.406719"},{"1":"4","2":"433","3":"455","4":"447","5":"468","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"4","2":"433","3":"455","4":"468","5":"547","6":"0","7":"0","8":"0","9":"79","10":"4.369448"},{"1":"4","2":"433","3":"455","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"5","2":"432","3":"472","4":"365","5":"446","6":"0","7":"0","8":"0","9":"81","10":"4.394449"},{"1":"5","2":"432","3":"472","4":"446","5":"467","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"5","2":"432","3":"472","4":"467","5":"547","6":"1","7":"0","8":"0","9":"80","10":"4.382027"},{"1":"5","2":"432","3":"472","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"6","2":"395","3":"474","4":"365","5":"409","6":"0","7":"0","8":"0","9":"44","10":"3.784190"},{"1":"6","2":"395","3":"474","4":"409","5":"430","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"6","2":"395","3":"474","4":"430","5":"547","6":"1","7":"0","8":"0","9":"117","10":"4.762174"},{"1":"6","2":"395","3":"474","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"7","2":"470","3":"485","4":"365","5":"484","6":"0","7":"0","8":"0","9":"119","10":"4.779123"},{"1":"7","2":"470","3":"485","4":"484","5":"505","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"7","2":"470","3":"485","4":"505","5":"547","6":"0","7":"0","8":"0","9":"42","10":"3.737670"},{"1":"7","2":"470","3":"485","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"8","2":"496","3":"524","4":"365","5":"510","6":"0","7":"0","8":"0","9":"145","10":"4.976734"},{"1":"8","2":"496","3":"524","4":"510","5":"531","6":"1","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"8","2":"496","3":"524","4":"531","5":"547","6":"0","7":"0","8":"0","9":"16","10":"2.772589"},{"1":"8","2":"496","3":"524","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"9","2":"428","3":"700","4":"365","5":"442","6":"0","7":"0","8":"0","9":"77","10":"4.343805"},{"1":"9","2":"428","3":"700","4":"442","5":"463","6":"0","7":"1","8":"0","9":"21","10":"3.044522"},{"1":"9","2":"428","3":"700","4":"463","5":"547","6":"0","7":"0","8":"0","9":"84","10":"4.430817"},{"1":"9","2":"428","3":"700","4":"547","5":"730","6":"1","7":"0","8":"1","9":"183","10":"5.209486"},{"1":"10","2":"716","3":"399","4":"365","5":"547","6":"1","7":"0","8":"0","9":"182","10":"5.204007"},{"1":"10","2":"716","3":"399","4":"547","5":"730","6":"0","7":"0","8":"1","9":"183","10":"5.209486"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   &lt;/script&gt;
 &lt;/div&gt;
 
@@ -135,63 +155,104 @@ MakeLongformat &lt;- function(df) {
   cuts &lt;- with(df, sort(c(start, end, start1, end1, age1)))
 
   ## Split observation times
-  out &lt;- data.frame(indiv = df$indiv,
-                    exday = df$exday,
-                    eventday = df$eventday,
-                    start = head(cuts, -1),
-                    end   = cuts[-1])
-
-  ## Event status for each interval
-  ## 1 if event day is within the interval
-  out$event &lt;- as.numeric(out$start &lt;= df$eventday &amp; df$eventday &lt;= out$end)
-
-  ## Exposure status for each interval
-  ## 1 if interval is within the window
-  out$exgr &lt;- as.numeric(df$start1 &lt;= out$start &amp; out$end &lt;= df$end1)
-
-  ## Age group status for each interval
-  ## 1 if start is greater than the age cutoff
-  out$agegr &lt;- as.numeric(out$start &gt;= df$age1)
-
-  ## Interval length
-  out$interval &lt;- out$end - out$start
-  out$loginterval &lt;- log(out$interval)
-
-  out
+  out &lt;- tibble(indiv = df$indiv,
+                exday = df$exday,
+                eventday = df$eventday,
+                start = head(cuts, -1),
+                end   = cuts[-1])
+  
+  ## Event, exposure, and age group status for each interval 
+  out %&gt;% 
+    mutate(event = as.integer(start &lt;= eventday &amp; eventday &lt;= end),
+           exgr = as.integer(df$start1 &lt;= start &amp; end &lt;= df$end1),
+           agegr = as.integer(start &gt;= df$age1),
+           interval = end - start,
+           loginterval = log(interval))
   }
 ```
 
 
 ---
-# Conditional logistic regression
+# Poisson regression with matched sample
 
-Long format data
-
-
-```r
-datLong &lt;- dat %&gt;% 
-  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %&gt;% 
-  split(.$indiv) %&gt;% 
-  map_dfr(MakeLongformat) %&gt;% 
-  filter(start &lt; 730)
-```
-
-Analysis with `clogit`
+A Poisson distribution during the period `\(k\)` of patient `\(i\)` with expected events: `\(\lambda_{ik}\)`
+ 
+`$$\lambda_{ik} = t_{ik}\exp(\phi_i + \beta X_i(k))$$`
 
 
-```r
-library(survival)
-clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %&gt;% 
-  summary 
-```
+- `\(t_{ik}\)`: Length of period `\(k\)` (as an **offset term**)
+
+
+- `\(\exp(\phi_i)\)`: The baseline (i.e., unexposed) incidence rate
+
+
+- `\(X_i(k)\)`: The exposure status of period `\(k\)` (0 for the control period and 1 for the exposure period) of patient `\(i\)` 
+
+--
+
+**[gnm](https://cran.r-project.org/package=gnm)** package 이용[[3](https://cran.r-project.org/package=gnm)].
 
 ---
 
 
+```r
+library(gnm)
+gnm(event ~ exgr + agegr + offset(loginterval), eliminate = factor(indiv), family = poisson, data = datLong) %&gt;% 
+  summary
+```
+
+```
+## 
+## Call:
+## 
+## gnm(formula = event ~ exgr + agegr + offset(loginterval), eliminate = factor(indiv), 
+##     family = poisson, data = datLong)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.05409  -0.60311  -0.42566   0.08177   1.72741  
+## 
+## Coefficients of interest:
+##       Estimate Std. Error z value Pr(&gt;|z|)    
+## exgr    2.4880     0.7085   3.512 0.000445 ***
+## agegr  -1.4906     1.1182  -1.333 0.182543    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+## Residual deviance: 20.177 on 26 degrees of freedom
+## AIC: 64.177
+## 
+## Number of iterations: 5
+```
+
+
+
+---
+# Conditional logistic regression
+
+Event는 포아송 분포를 따른다는 가정, 그러나 **0 아니면 1** 두 가지 뿐. 
+
+- Conditional logistic regression을 이용해도 같은 결과를 얻음. 
+
+- `offset(loginterval)` 옵션 추가로 끝. 
+
+- **[survival](https://CRAN.R-project.org/package=survival)** 패키지의 `clogit` 함수[[4](https://CRAN.R-project.org/package=survival)].
+
+---
+
+
+```r
+library(survival)
+clogit(event ~ exgr + agegr + offset(loginterval) + strata(indiv), data = datLong) %&gt;% 
+  summary 
+```
+
 ```
 ## Call:
-## coxph(formula = Surv(rep(1, 38L), event) ~ exgr + agegr + strata(indiv) + 
-##     offset(loginterval), data = datLong, method = "exact")
+## coxph(formula = Surv(rep(1, 38L), event) ~ exgr + agegr + offset(loginterval) + 
+##     strata(indiv), data = datLong, method = "exact")
 ## 
 ##   n= 38, number of events= 10 
 ## 
@@ -217,21 +278,24 @@ clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLon
 # 조심 
 
 .large[
-* Time-varying confounder
+- Time-varying confounder
 
-* Time trends in both exposures and events
 
-* Erroneously long risk periods 
+- Time trends in both exposures and events
 
-* Patient restriction based on event history
+
+- Erroneously long risk periods 
+
+
+- Patient restriction based on event history
 ]
 
 ---
 
-<div id="htmlwidget-571bbacda585c18d3a87" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-571bbacda585c18d3a87">{"x":{"filter":"none","caption":"<caption>Violation of assumptions, impact, and solutions with examples of good practice<\/caption>","data":[["Event temporarily decreases probability of exposure","Event temporarily increases probability of exposure","No exposure can occur (or is observed) after event",null,"Event increases probability of death",null,"Recurrences of an event are not independent"],["Include a pre-exposure period","Include a pre-exposure period","For single exposures that cannot be repeated, begin observation period at exposure, so only exposed cases are included. End observation at planned end","For single or multiple exposures, use method outlined in Farrington et al","Undertake suitable tests or sensitivity analyses excluding cases who died as a result of event","If necessary, use methods outlined in Farrington et al to adjust for bias","Study first event only"],["Stowe et al studied the risk of infections after mumps, measles, and rubella vaccination. Vaccination is delayed when a child has an infection; a 14 day pre-exposure period was included to allow for this","Gibson et al studied the association between prescription drugs and motor vehicle crashes. A four week pre-exposure period was included as some drugs may be used to treat anxiety or pain caused by the crash","Hubbard et al studied the association between first bupropion prescription and sudden death. The observation period began with date of first prescription and ended (beyond death) with date of last data collection for the cohort. At the time, bupropion could only be prescribed as a single course of treatment","Dodd et al studied the association between influenza vaccination and Guillain Barré syndrome (GBS). Some practitioners will not vaccinate patients with previous GBS.10 Various analyses were performed: standard SCCS, vaccinated cases only, and the method outlined in Farrington et al","Langan et al studied the risk of stroke after herpes zoster infection. A sensitivity analysis was performed excluding cases who died within 90 days of stroke. Findings were not modified","Brauer et al studied the association between antipsychotic drugs and myocardial infarction using both methods outlined in Farrington et al12 and a standard SCCS analysis. There was little difference in results","Recurrence of stroke is not independent of the first occurrence, so only a first stroke event can be studied. In a study on the risk of stroke, Langan et al began the observation period 12 months into follow-up time to ensure first stroke events had been correctly identified11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Problems<\/th>\n      <th>Solutions<\/th>\n      <th>Examples<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<<t>ip>","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3efd40a3076a2c31f191" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3efd40a3076a2c31f191">{"x":{"filter":"none","caption":"<caption>Violation of assumptions, impact, and solutions with examples of good practice<\/caption>","data":[["Event temporarily decreases probability of exposure","Event temporarily increases probability of exposure","No exposure can occur (or is observed) after event",null,"Event increases probability of death",null,"Recurrences of an event are not independent"],["Include a pre-exposure period","Include a pre-exposure period","For single exposures that cannot be repeated, begin observation period at exposure, so only exposed cases are included. End observation at planned end","For single or multiple exposures, use method outlined in Farrington et al","Undertake suitable tests or sensitivity analyses excluding cases who died as a result of event","If necessary, use methods outlined in Farrington et al to adjust for bias","Study first event only"],["Stowe et al studied the risk of infections after mumps, measles, and rubella vaccination. Vaccination is delayed when a child has an infection; a 14 day pre-exposure period was included to allow for this","Gibson et al studied the association between prescription drugs and motor vehicle crashes. A four week pre-exposure period was included as some drugs may be used to treat anxiety or pain caused by the crash","Hubbard et al studied the association between first bupropion prescription and sudden death. The observation period began with date of first prescription and ended (beyond death) with date of last data collection for the cohort. At the time, bupropion could only be prescribed as a single course of treatment","Dodd et al studied the association between influenza vaccination and Guillain Barré syndrome (GBS). Some practitioners will not vaccinate patients with previous GBS.10 Various analyses were performed: standard SCCS, vaccinated cases only, and the method outlined in Farrington et al","Langan et al studied the risk of stroke after herpes zoster infection. A sensitivity analysis was performed excluding cases who died within 90 days of stroke. Findings were not modified","Brauer et al studied the association between antipsychotic drugs and myocardial infarction using both methods outlined in Farrington et al12 and a standard SCCS analysis. There was little difference in results","Recurrence of stroke is not independent of the first occurrence, so only a first stroke event can be studied. In a study on the risk of stroke, Langan et al began the observation period 12 months into follow-up time to ensure first stroke events had been correctly identified11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Problems<\/th>\n      <th>Solutions<\/th>\n      <th>Examples<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<<t>ip>","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
-Table from &lt;a name=cite-Petersen2016&gt;&lt;/a&gt;[Petersen, Douglas, and Whitaker [2]](https://doi.org/10.1136/bmj.i4515)
+Table from [Petersen, Douglas, and Whitaker [2]](https://doi.org/10.1136/bmj.i4515)
 ---
 
 class: center, middle
@@ -258,11 +322,21 @@ methods: an alternative to standard epidemiological study
 designs". In: _BMJ_ (Sep. 2016), p. i4515. DOI:
 [10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515). URL:
 [https://doi.org/10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515).
+
+&lt;a name=bib-dnmRpackage&gt;&lt;/a&gt;[[3]](#cite-dnmRpackage) H. Turner and
+D. Firth. _Generalized nonlinear models in R: An overview of the
+gnm package_. R package version 1.1-0. 2018. URL:
+[https://cran.r-project.org/package=gnm](https://cran.r-project.org/package=gnm).
+
+&lt;a name=bib-survival-package&gt;&lt;/a&gt;[[4]](#cite-survival-package) T.
+M. Therneau. _A Package for Survival Analysis in S_. version 2.38.
+2015. URL:
+[https://CRAN.R-project.org/package=survival](https://CRAN.R-project.org/package=survival).
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script src="js/macros.js"></script>
 <script>var slideshow = remark.create({
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` ",
+"slideNumberFormat": "<div class=\"progress-bar-container\">   </div>   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\"> ",
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,

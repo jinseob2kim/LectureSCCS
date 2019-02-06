@@ -11,9 +11,8 @@ output:
       beforeInit: "js/macros.js"
       slideNumberFormat: |
         <div class="progress-bar-container">
-          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
           </div>
-        </div>`
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
@@ -111,11 +110,27 @@ From https://rpubs.com/kaz_yos/sccs1
 ---
 # Assumptions
 
-.large[
-* 노출 위험 기간: 노출 시작부터 14-35일. 
+- 노출 위험 기간: 노출 시작부터 14-35일. 
 
-* 나이 바뀌는 날: 365-730일의 중간인 547일.
-]
+- 나이 바뀌는 날: 365-730일의 중간인 547일.
+
+--
+
+```{r}
+paged_table(head(dat, 1))
+```
+
+- 365: 관찰 시작
+
+- 472: 노출 시작 (458 + 14)
+
+- 493: 노출 종료 (458 + 35)
+
+- 547: 나이 증가 
+
+- 730: 관찰 종료
+
+4개 구간 각각의 **사건 발생, 노출 상태, 나이** 데이터를 만들어야 함. 
 
 ---
 # Long format data
@@ -126,40 +141,31 @@ MakeLongformat <- function(df) {
   cuts <- with(df, sort(c(start, end, start1, end1, age1)))
 
   ## Split observation times
-  out <- data.frame(indiv = df$indiv,
-                    exday = df$exday,
-                    eventday = df$eventday,
-                    start = head(cuts, -1),
-                    end   = cuts[-1])
-
-  ## Event status for each interval
-  ## 1 if event day is within the interval
-  out$event <- as.numeric(out$start <= df$eventday & df$eventday <= out$end)
-
-  ## Exposure status for each interval
-  ## 1 if interval is within the window
-  out$exgr <- as.numeric(df$start1 <= out$start & out$end <= df$end1)
-
-  ## Age group status for each interval
-  ## 1 if start is greater than the age cutoff
-  out$agegr <- as.numeric(out$start >= df$age1)
-
-  ## Interval length
-  out$interval <- out$end - out$start
-  out$loginterval <- log(out$interval)
-
-  out
+  out <- tibble(indiv = df$indiv,
+                exday = df$exday,
+                eventday = df$eventday,
+                start = head(cuts, -1),
+                end   = cuts[-1])
+  
+  ## Event, exposure, and age group status for each interval 
+  out %>% 
+    mutate(event = as.integer(start <= eventday & eventday <= end),
+           exgr = as.integer(df$start1 <= start & end <= df$end1),
+           agegr = as.integer(start >= df$age1),
+           interval = end - start,
+           loginterval = log(interval))
   }
 ```
 
 
 ```{r, echo=T}
-dat %>% 
+datLong <- dat %>% 
   mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %>% 
   split(.$indiv) %>% 
   map_dfr(MakeLongformat) %>% 
-  paged_table
+  filter(start < 730) 
 
+paged_table(datLong)
 ```
 
 ---
@@ -170,60 +176,69 @@ MakeLongformat <- function(df) {
   cuts <- with(df, sort(c(start, end, start1, end1, age1)))
 
   ## Split observation times
-  out <- data.frame(indiv = df$indiv,
-                    exday = df$exday,
-                    eventday = df$eventday,
-                    start = head(cuts, -1),
-                    end   = cuts[-1])
-
-  ## Event status for each interval
-  ## 1 if event day is within the interval
-  out$event <- as.numeric(out$start <= df$eventday & df$eventday <= out$end)
-
-  ## Exposure status for each interval
-  ## 1 if interval is within the window
-  out$exgr <- as.numeric(df$start1 <= out$start & out$end <= df$end1)
-
-  ## Age group status for each interval
-  ## 1 if start is greater than the age cutoff
-  out$agegr <- as.numeric(out$start >= df$age1)
-
-  ## Interval length
-  out$interval <- out$end - out$start
-  out$loginterval <- log(out$interval)
-
-  out
+  out <- tibble(indiv = df$indiv,
+                exday = df$exday,
+                eventday = df$eventday,
+                start = head(cuts, -1),
+                end   = cuts[-1])
+  
+  ## Event, exposure, and age group status for each interval 
+  out %>% 
+    mutate(event = as.integer(start <= eventday & eventday <= end),
+           exgr = as.integer(df$start1 <= start & end <= df$end1),
+           agegr = as.integer(start >= df$age1),
+           interval = end - start,
+           loginterval = log(interval))
   }
 ```
 
 
 ---
-# Conditional logistic regression
+# Poisson regression with matched sample
 
-Long format data
+A Poisson distribution during the period $k$ of patient $i$ with expected events: $\lambda_{ik}$
+ 
+$$\lambda_{ik} = t_{ik}\exp(\phi_i + \beta X_i(k))$$
 
-```{r, echo = T}
-datLong <- dat %>% 
-  mutate(start1 = exday +14,  end1 = exday + 35, age1 = 547) %>% 
-  split(.$indiv) %>% 
-  map_dfr(MakeLongformat) %>% 
-  filter(start < 730)
-```
 
-Analysis with `clogit`
+- $t_{ik}$: Length of period $k$ (as an **offset term**)
 
-```{r, echo =T, eval=F}
-library(survival)
-clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %>% 
-  summary 
 
-```
+- $\exp(\phi_i)$: The baseline (i.e., unexposed) incidence rate
+
+
+- $X_i(k)$: The exposure status of period $k$ (0 for the control period and 1 for the exposure period) of patient $i$ 
+
+--
+
+**[gnm](https://cran.r-project.org/package=gnm)** package 이용`r Citep(myBib, "dnmRpackage")`.
 
 ---
 
-```{r, echo = F}
+```{r, echo = T}
+library(gnm)
+gnm(event ~ exgr + agegr + offset(loginterval), eliminate = factor(indiv), family = poisson, data = datLong) %>% 
+  summary
+```
+
+
+
+---
+# Conditional logistic regression
+
+Event는 포아송 분포를 따른다는 가정, 그러나 **0 아니면 1** 두 가지 뿐. 
+
+- Conditional logistic regression을 이용해도 같은 결과를 얻음. 
+
+- `offset(loginterval)` 옵션 추가로 끝. 
+
+- **[survival](https://CRAN.R-project.org/package=survival)** 패키지의 `clogit` 함수`r Citep(myBib, "survival-package")`.
+
+---
+
+```{r, echo =T, eval=T}
 library(survival)
-clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLong) %>% 
+clogit(event ~ exgr + agegr + offset(loginterval) + strata(indiv), data = datLong) %>% 
   summary 
 
 ```
@@ -233,13 +248,16 @@ clogit(event ~ exgr + agegr + strata(indiv) + offset(loginterval), data = datLon
 # 조심 
 
 .large[
-* Time-varying confounder
+- Time-varying confounder
 
-* Time trends in both exposures and events
 
-* Erroneously long risk periods 
+- Time trends in both exposures and events
 
-* Patient restriction based on event history
+
+- Erroneously long risk periods 
+
+
+- Patient restriction based on event history
 ]
 
 ---
