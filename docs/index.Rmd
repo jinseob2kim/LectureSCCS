@@ -58,7 +58,7 @@ layout: true
 
 * 한 사람에게 일어나는 각 **사건(ex: 노출, 발생, 나이)이 변화할 때 마다 데이터를 만든다** (Long format data).
 
-* Matched case-control study와 유사, **Conditional logistic regression**으로 분석한다.
+* Matched case-control study와 유사, **Conditional logistic regression**으로도 분석할 수 있다.
 ]
 
 

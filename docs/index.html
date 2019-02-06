@@ -55,7 +55,7 @@ layout: true
 
 * 한 사람에게 일어나는 각 **사건(ex: 노출, 발생, 나이)이 변화할 때 마다 데이터를 만든다** (Long format data).
 
-* Matched case-control study와 유사, **Conditional logistic regression**으로 분석한다.
+* Matched case-control study와 유사, **Conditional logistic regression**으로도 분석할 수 있다.
 ]
 
 
@@ -67,12 +67,12 @@ layout: true
 &lt;p class="caption"&gt;a: SCCS, b: CCO, c: SSA&lt;/p&gt;
 &lt;/div&gt;
 
-Figure from [Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
+Figure from &lt;a name=cite-Takeuchi2018&gt;&lt;/a&gt;[Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
 
 ---
 
-<div id="htmlwidget-207d38fa8d15596926fb" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-207d38fa8d15596926fb">{"x":{"filter":"none","data":[["Self-controlled case series","Case-crossover design","Sequence symmetry analysis"],["Incident rate ratio","(Exposure) odds ratio","Adjusted sequence ratio"],["Case patients who experienced at least one event during each observation period","Case patients who experienced at least one event during each observation period","Case patients who experienced at least one exposure or one event during each observation period"],["Every exposure and every event for each case patient","Every exposure and the first event for each case patient","The first exposure and first event for the study population"],["Events do not alter the probability of subsequent exposure and events.","There are no time-trends in the occurrence of exposure.","Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.\n"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Methods<\/th>\n      <th>Effect measures<\/th>\n      <th>Study populations<\/th>\n      <th>Information used in analysis<\/th>\n      <th>Main assumptions<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<t>","order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4e085af0c99878d93e3d" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4e085af0c99878d93e3d">{"x":{"filter":"none","data":[["Self-controlled case series","Case-crossover design","Sequence symmetry analysis"],["Incident rate ratio","(Exposure) odds ratio","Adjusted sequence ratio"],["Case patients who experienced at least one event during each observation period","Case patients who experienced at least one event during each observation period","Case patients who experienced at least one exposure or one event during each observation period"],["Every exposure and every event for each case patient","Every exposure and the first event for each case patient","The first exposure and first event for the study population"],["Events do not alter the probability of subsequent exposure and events.","There are no time-trends in the occurrence of exposure.","Events do not alter the probability of subsequent exposure. \r\n Trends in the occurrence of exposure and events are similar to those for the study population.\n"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Methods<\/th>\n      <th>Effect measures<\/th>\n      <th>Study populations<\/th>\n      <th>Information used in analysis<\/th>\n      <th>Main assumptions<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<t>","order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 Table from [Takeuchi, Shinozaki, and Matsuyama [1]](https://doi.org/10.1186/s12874-017-0457-7)
 
@@ -190,7 +190,7 @@ A Poisson distribution during the period `\(k\)` of patient `\(i\)` with expecte
 
 --
 
-**[gnm](https://cran.r-project.org/package=gnm)** package 이용[[3](https://cran.r-project.org/package=gnm)].
+**[gnm](https://cran.r-project.org/package=gnm)** package 이용&lt;a name=cite-dnmRpackage&gt;&lt;/a&gt;[[2](https://cran.r-project.org/package=gnm)].
 
 ---
 
@@ -238,7 +238,7 @@ Event는 포아송 분포를 따른다는 가정, 그러나 **0 아니면 1** �
 
 - `offset(loginterval)` 옵션 추가로 끝. 
 
-- **[survival](https://CRAN.R-project.org/package=survival)** 패키지의 `clogit` 함수[[4](https://CRAN.R-project.org/package=survival)].
+- **[survival](https://CRAN.R-project.org/package=survival)** 패키지의 `clogit` 함수&lt;a name=cite-survival-package&gt;&lt;/a&gt;[[3](https://CRAN.R-project.org/package=survival)].
 
 ---
 
@@ -292,10 +292,10 @@ clogit(event ~ exgr + agegr + offset(loginterval) + strata(indiv), data = datLon
 
 ---
 
-<div id="htmlwidget-3efd40a3076a2c31f191" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3efd40a3076a2c31f191">{"x":{"filter":"none","caption":"<caption>Violation of assumptions, impact, and solutions with examples of good practice<\/caption>","data":[["Event temporarily decreases probability of exposure","Event temporarily increases probability of exposure","No exposure can occur (or is observed) after event",null,"Event increases probability of death",null,"Recurrences of an event are not independent"],["Include a pre-exposure period","Include a pre-exposure period","For single exposures that cannot be repeated, begin observation period at exposure, so only exposed cases are included. End observation at planned end","For single or multiple exposures, use method outlined in Farrington et al","Undertake suitable tests or sensitivity analyses excluding cases who died as a result of event","If necessary, use methods outlined in Farrington et al to adjust for bias","Study first event only"],["Stowe et al studied the risk of infections after mumps, measles, and rubella vaccination. Vaccination is delayed when a child has an infection; a 14 day pre-exposure period was included to allow for this","Gibson et al studied the association between prescription drugs and motor vehicle crashes. A four week pre-exposure period was included as some drugs may be used to treat anxiety or pain caused by the crash","Hubbard et al studied the association between first bupropion prescription and sudden death. The observation period began with date of first prescription and ended (beyond death) with date of last data collection for the cohort. At the time, bupropion could only be prescribed as a single course of treatment","Dodd et al studied the association between influenza vaccination and Guillain Barré syndrome (GBS). Some practitioners will not vaccinate patients with previous GBS.10 Various analyses were performed: standard SCCS, vaccinated cases only, and the method outlined in Farrington et al","Langan et al studied the risk of stroke after herpes zoster infection. A sensitivity analysis was performed excluding cases who died within 90 days of stroke. Findings were not modified","Brauer et al studied the association between antipsychotic drugs and myocardial infarction using both methods outlined in Farrington et al12 and a standard SCCS analysis. There was little difference in results","Recurrence of stroke is not independent of the first occurrence, so only a first stroke event can be studied. In a study on the risk of stroke, Langan et al began the observation period 12 months into follow-up time to ensure first stroke events had been correctly identified11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Problems<\/th>\n      <th>Solutions<\/th>\n      <th>Examples<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<<t>ip>","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0aec2abe34c7a45687a9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0aec2abe34c7a45687a9">{"x":{"filter":"none","caption":"<caption>Violation of assumptions, impact, and solutions with examples of good practice<\/caption>","data":[["Event temporarily decreases probability of exposure","Event temporarily increases probability of exposure","No exposure can occur (or is observed) after event",null,"Event increases probability of death",null,"Recurrences of an event are not independent"],["Include a pre-exposure period","Include a pre-exposure period","For single exposures that cannot be repeated, begin observation period at exposure, so only exposed cases are included. End observation at planned end","For single or multiple exposures, use method outlined in Farrington et al","Undertake suitable tests or sensitivity analyses excluding cases who died as a result of event","If necessary, use methods outlined in Farrington et al to adjust for bias","Study first event only"],["Stowe et al studied the risk of infections after mumps, measles, and rubella vaccination. Vaccination is delayed when a child has an infection; a 14 day pre-exposure period was included to allow for this","Gibson et al studied the association between prescription drugs and motor vehicle crashes. A four week pre-exposure period was included as some drugs may be used to treat anxiety or pain caused by the crash","Hubbard et al studied the association between first bupropion prescription and sudden death. The observation period began with date of first prescription and ended (beyond death) with date of last data collection for the cohort. At the time, bupropion could only be prescribed as a single course of treatment","Dodd et al studied the association between influenza vaccination and Guillain Barré syndrome (GBS). Some practitioners will not vaccinate patients with previous GBS.10 Various analyses were performed: standard SCCS, vaccinated cases only, and the method outlined in Farrington et al","Langan et al studied the risk of stroke after herpes zoster infection. A sensitivity analysis was performed excluding cases who died within 90 days of stroke. Findings were not modified","Brauer et al studied the association between antipsychotic drugs and myocardial infarction using both methods outlined in Farrington et al12 and a standard SCCS analysis. There was little difference in results","Recurrence of stroke is not independent of the first occurrence, so only a first stroke event can be studied. In a study on the risk of stroke, Langan et al began the observation period 12 months into follow-up time to ensure first stroke events had been correctly identified11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Problems<\/th>\n      <th>Solutions<\/th>\n      <th>Examples<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"<<t>ip>","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
-Table from [Petersen, Douglas, and Whitaker [2]](https://doi.org/10.1136/bmj.i4515)
+Table from &lt;a name=cite-Petersen2016&gt;&lt;/a&gt;[Petersen, Douglas, and Whitaker [4]](https://doi.org/10.1136/bmj.i4515)
 ---
 
 class: center, middle
@@ -316,22 +316,22 @@ DOI:
 URL:
 [https://doi.org/10.1186/s12874-017-0457-7](https://doi.org/10.1186/s12874-017-0457-7).
 
-&lt;a name=bib-Petersen2016&gt;&lt;/a&gt;[[2]](#cite-Petersen2016) I.
+&lt;a name=bib-dnmRpackage&gt;&lt;/a&gt;[[2]](#cite-dnmRpackage) H. Turner and
+D. Firth. _Generalized nonlinear models in R: An overview of the
+gnm package_. R package version 1.1-0. 2018. URL:
+[https://cran.r-project.org/package=gnm](https://cran.r-project.org/package=gnm).
+
+&lt;a name=bib-survival-package&gt;&lt;/a&gt;[[3]](#cite-survival-package) T.
+M. Therneau. _A Package for Survival Analysis in S_. version 2.38.
+2015. URL:
+[https://CRAN.R-project.org/package=survival](https://CRAN.R-project.org/package=survival).
+
+&lt;a name=bib-Petersen2016&gt;&lt;/a&gt;[[4]](#cite-Petersen2016) I.
 Petersen, I. Douglas and H. Whitaker. "Self controlled case series
 methods: an alternative to standard epidemiological study
 designs". In: _BMJ_ (Sep. 2016), p. i4515. DOI:
 [10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515). URL:
 [https://doi.org/10.1136/bmj.i4515](https://doi.org/10.1136/bmj.i4515).
-
-&lt;a name=bib-dnmRpackage&gt;&lt;/a&gt;[[3]](#cite-dnmRpackage) H. Turner and
-D. Firth. _Generalized nonlinear models in R: An overview of the
-gnm package_. R package version 1.1-0. 2018. URL:
-[https://cran.r-project.org/package=gnm](https://cran.r-project.org/package=gnm).
-
-&lt;a name=bib-survival-package&gt;&lt;/a&gt;[[4]](#cite-survival-package) T.
-M. Therneau. _A Package for Survival Analysis in S_. version 2.38.
-2015. URL:
-[https://CRAN.R-project.org/package=survival](https://CRAN.R-project.org/package=survival).
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script src="js/macros.js"></script>
